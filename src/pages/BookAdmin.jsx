@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import TableRow from "../components/TableRow";
-import { useUser } from "../context/UserContext";
+import useUser from "../hooks/useUser";
 import { getBooks } from "../services/firestore";
 
 const BookAdmin = () => {
-  const { user } = useUser();
+  const user = useUser();
   const [books, setBooks] = useState([]);
   useEffect(() => {
     getBooks().then((res) => {

@@ -1,32 +1,17 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
-import { getUserDB } from "../services/firestore";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
+import User from "../components/User";
+import useUser, { USER_STATES } from "../hooks/useUser";
 
 const Home = () => {
-  const { user, loggedUser } = useUser();
-  console.log(user);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    } else {
-      getUserDB(user.uid).then((userDB) => {
-        loggedUser({ ...user, rol: userDB.rol });
-      });
-    }
-  }, []);
+  const user = useUser();
 
   return (
     <div>
       <h1>Home</h1>
-      {user && (
-        <div>
-          <h3>User Info</h3>
-          <p>email: {user.email}</p>
-          {user.rol && <p>rol: {user.rol}</p>}
-        </div>
-      )}
+      {user === USER_STATES.NOT_KNOWN && <Loader />}
+      {user && user.uid && <User user={user} />}
     </div>
   );
 };

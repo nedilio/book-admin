@@ -60,13 +60,18 @@ export const createBook = async (book) => {
 export const createUserDB = async (user) => {
   const { email, uid } = user;
   const userRef = doc(db, `users/${uid}`);
-  setDoc(userRef, { email, uid, rol: "" }).then((data) =>
-    console.log("usuario creado: ", data)
-  );
+  await setDoc(userRef, { email, uid, rol: "" });
+  const userDB = await getDoc(userRef);
+  return userDB.data();
 };
 
 export const getUserDB = async (id) => {
   const userRef = doc(db, "users", id);
   const user = await getDoc(userRef);
   return { ...user.data() };
+};
+
+export const updateUser = (id, user) => {
+  const userRef = doc(db, "users", id);
+  updateDoc(userRef, user);
 };

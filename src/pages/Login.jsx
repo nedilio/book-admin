@@ -1,29 +1,45 @@
+import { stringify } from "postcss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 import { createUser, signInUser } from "../services/auth";
+import { createUserDB } from "../services/firestore";
 
 const Login = () => {
-  const { loggedUser } = useUser();
-
   const [user, setUser] = useState({ email: "", password: "" });
+  const [error, setError] = useState(null);
   const [haveAccount, setHaveAccount] = useState(true);
   const navigate = useNavigate();
 
+  const ERRORCODES = {
+    "auth/invalid-email": "Email inválido",
+    "auth/weak-password": "La contraseña debe tener por lo menos 6 caracteres",
+    "auth/email-already-in-use": "El correo ya existe",
+  };
+
   const handleCreateAccount = (e) => {
     e.preventDefault();
-    createUser(user.email, user.password).then((userCreated) => {
-      loggedUser(userCreated);
-      navigate("/");
-    });
+    createUser(user.email, user.password)
+      .then(async (userCredential) => {
+        setError(null);
+        const user = userCredential.user;
+        const userDB = await createUserDB(user);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, rol: userDB.rol })
+        );
+        navigate(`/profile/${user.uid}`);
+      })
+      .catch((error) => {
+        console.error(error.message);
+        setError(ERRORCODES[error.code]);
+      });
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("login", user);
     signInUser(user).then((userCreated) => {
-      loggedUser(userCreated);
-      navigate("/");
+      navigate(`/profile/${userCreated.uid}`);
     });
   };
 
@@ -35,6 +51,7 @@ const Login = () => {
     <div>
       <h1>{haveAccount ? "Iniciar sesion" : "Crear cuenta"}</h1>
       <form action="" className="border-zinc-800 border-2 p-4">
+        {error && <p>Error: {error}</p>}
         <label
           htmlFor="email"
           className="inline-block text-sm font-bold mb-2 w-1/2 py-2"

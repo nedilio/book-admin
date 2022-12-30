@@ -2,24 +2,17 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  updateProfile,
 } from "firebase/auth";
+import { useId } from "react";
 import { app } from "./firebase";
-import { createUserDB } from "./firestore";
 
-const auth = getAuth(app);
+export const auth = getAuth(app);
 
 export const createUser = (email, password) => {
-  return createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log(userCredential);
-      const user = userCredential.user;
-      console.log(user);
-      createUserDB(user);
-      return user;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  return createUserWithEmailAndPassword(auth, email, password);
 };
 
 export const signInUser = (user) => {
@@ -31,5 +24,33 @@ export const signInUser = (user) => {
     })
     .catch((error) => {
       console.log(error);
+    });
+};
+
+export const logout = () => {
+  signOut(auth);
+};
+
+export const onAuthStateChangedCheck = (onChange) => {
+  return onAuthStateChanged(auth, (user) => {
+    const { uid, displayName, photoURL, email } = user;
+    const normalizedUser = { uid, displayName, photoURL, email };
+    onChange(normalizedUser);
+  });
+};
+
+export const currentUser = () => {
+  updateProfile(auth.currentUser, {
+    displayName: "Nelson Izquierdo",
+    photoURL: "https://avatars.githubusercontent.com/u/2835435?v=4",
+    role: "admin",
+  })
+    .then(() => {
+      // Profile updated!
+      // ...
+    })
+    .catch((error) => {
+      // An error occurred
+      // ...
     });
 };

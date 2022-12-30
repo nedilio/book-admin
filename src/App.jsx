@@ -6,6 +6,7 @@ import BookForm from "./pages/BookForm";
 import UserContextProvider from "./context/UserContext";
 import Login from "./pages/Login";
 import NavBar from "./components/NavBar";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/edit-book/:id" element={<BookForm />} />
             <Route path="/new-book/" element={<BookForm />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile/:id" element={<Profile />} />
           </Routes>
         </BrowserRouter>
       </UserContextProvider>
