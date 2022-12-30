@@ -17,11 +17,11 @@ import { app } from "./firebase";
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export const saveImage = (file) => {
+export const saveImage = (file, path) => {
   const metadata = {
     contentType: "image/jpeg",
   };
-  const storageRef = ref(storage, `images/${file.name}`);
+  const storageRef = ref(storage, `${path}/${Date.now() + file.name}`);
   const task = uploadBytesResumable(storageRef, file, metadata);
   return task;
 };

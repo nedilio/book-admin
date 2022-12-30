@@ -6,7 +6,6 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { useId } from "react";
 import { app } from "./firebase";
 
 export const auth = getAuth(app);
@@ -33,24 +32,17 @@ export const logout = () => {
 
 export const onAuthStateChangedCheck = (onChange) => {
   return onAuthStateChanged(auth, (user) => {
-    const { uid, displayName, photoURL, email } = user;
-    const normalizedUser = { uid, displayName, photoURL, email };
-    onChange(normalizedUser);
+    console.log(user);
+    if (user) {
+      const { uid, displayName, photoURL, email } = user;
+      const normalizedUser = { uid, displayName, photoURL, email };
+      onChange(normalizedUser);
+    } else {
+      onChange(user);
+    }
   });
 };
 
-export const currentUser = () => {
-  updateProfile(auth.currentUser, {
-    displayName: "Nelson Izquierdo",
-    photoURL: "https://avatars.githubusercontent.com/u/2835435?v=4",
-    role: "admin",
-  })
-    .then(() => {
-      // Profile updated!
-      // ...
-    })
-    .catch((error) => {
-      // An error occurred
-      // ...
-    });
+export const updateUser = (user) => {
+  return updateProfile(auth.currentUser, user);
 };
